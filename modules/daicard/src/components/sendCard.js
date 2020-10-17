@@ -12,6 +12,8 @@ import {
   TextField,
   Typography,
   withStyles,
+  Select,
+  MenuItem,
 } from "@material-ui/core";
 import { Send as SendIcon, Link as LinkIcon } from "@material-ui/icons";
 import { useMachine } from "@xstate/react";
@@ -55,6 +57,7 @@ const formatAmountString = (amount) => {
 export const SendCard = style(
   ({ balance, channel, classes, ethProvider, history, location, token }) => {
     const [amount, setAmount] = useState({ display: "", error: null, value: null });
+    const [tokenName, setTokenName] = useState('ETH');
     const [link, setLink] = useState(undefined);
     const [paymentState, paymentAction] = useMachine(sendMachine);
     const [recipient, setRecipient, setRecipientError] = usePublicIdentifier(null, ethProvider);
@@ -89,7 +92,17 @@ export const SendCard = style(
       },
       [tokenBalance],
     );
-
+    const updateTokenHandler = useCallback(
+        tokenValue => {
+            let theTokenName = tokenValue.target.value;
+            console.log(theTokenName);
+            if (theTokenName !== 'ETH') {
+                setTokenName(theTokenName);
+            } else {
+                setTokenName('ETH');
+            }
+        }
+    );
     const paymentHandler = async () => {
       if (!channel || !token || amount.error || recipient.error) return;
       if (!recipient.value) {
@@ -113,6 +126,7 @@ export const SendCard = style(
             preImage: getRandomBytes32(),
             recipient: recipient.value,
             meta: { source: "daicard" },
+            tokenName,
           });
           break;
         } catch (e) {
@@ -222,19 +236,35 @@ export const SendCard = style(
         </Grid>
 
         <Grid item xs={12} style={{ width: "100%" }}>
-          <TextField
-            fullWidth
-            error={amount.error !== null}
-            helperText={amount.error}
-            id="outlined-number"
-            label="Amount"
-            margin="normal"
-            onChange={(evt) => updateAmountHandler(evt.target.value)}
-            style={{ width: "100%" }}
-            type="number"
-            value={amount.display}
-            variant="outlined"
-          />
+            <Grid container direction="row" alignItems="center">
+                <Grid item xs={4}>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      style={{width: '80%'}}
+                      value={tokenName}
+                      onChange={(evt) => updateTokenHandler(evt)}
+                    >
+                        <MenuItem value='ETH'>ETH</MenuItem>
+                        <MenuItem value='0x7c07c42973047223f80c4a69bb62d5195460eb5f'>tBTC</MenuItem>
+                        <MenuItem value='0x07613e772b0d2e4a230038a67b1edd55459efd5e'>KEEP</MenuItem>
+                    </Select>
+                </Grid>
+                <Grid item xs={8}>
+                  <TextField
+                    fullWidth
+                    error={amount.error !== null}
+                    helperText={amount.error}
+                    id="outlined-number"
+                    label="Amount"
+                    margin="normal"
+                    onChange={(evt) => updateAmountHandler(evt.target.value)}
+                    style={{ width: "100%" }}
+                    type="number"
+                    value={amount.display}
+                    variant="outlined"
+                  />
+                 </Grid>
+            </Grid>
         </Grid>
 
         <Grid item xs={12} style={{ width: "100%" }}>
