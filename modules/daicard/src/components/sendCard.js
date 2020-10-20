@@ -119,7 +119,7 @@ export const SendCard = style(
       while (Date.now() < endingTs) {
         try {
           transferRes = await channel.conditionalTransfer({
-            assetId: token.address,
+            assetId: tokenName,
             amount: amount.value.wad.toString(),
             conditionType: ConditionalTransferTypes.LinkedTransfer,
             paymentId: getRandomBytes32(),
@@ -244,7 +244,7 @@ export const SendCard = style(
                       value={tokenName}
                       onChange={(evt) => updateTokenHandler(evt)}
                     >
-                        <MenuItem value='ETH'>ETH</MenuItem>
+                        <MenuItem value='0x0000000000000000000000000000000000000000'>ETH</MenuItem>
                         <MenuItem value='0x7c07c42973047223f80c4a69bb62d5195460eb5f'>tBTC</MenuItem>
                         <MenuItem value='0x07613e772b0d2e4a230038a67b1edd55459efd5e'>KEEP</MenuItem>
                     </Select>
